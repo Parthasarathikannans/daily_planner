@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Daily Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f3f6f8;--card:#fff;--ink:#14212b;--mute:#5d6d7a;--line:#dbe3e9;--brand:#0f6b6b;--brand-ink:#fff;--hi:#c62f3a;--med:#b7791f;--lo:#2f8a4f;--done:#8a99a5;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media(prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e161c;--card:#16222a;--ink:#e7eef3;--mute:#93a4b1;--line:#25353f;--brand:#3fb5b0;--brand-ink:#06201f;--hi:#ff6b75;--med:#e6b04d;--lo:#5cc586;--done:#6b7d8a}}
+:root[data-theme="dark"]{--bg:#0e161c;--card:#16222a;--ink:#e7eef3;--mute:#93a4b1;--line:#25353f;--brand:#3fb5b0;--brand-ink:#06201f;--hi:#ff6b75;--med:#e6b04d;--lo:#5cc586;--done:#6b7d8a}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 "Bricolage Grotesque",system-ui,-apple-system,"Segoe UI",sans-serif}
+.wrap{max-width:860px;margin:0 auto;padding:20px 16px 60px}
+header{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
+h1{font-size:1.6rem;margin:0;letter-spacing:-.02em}
+.tabs{display:flex;gap:4px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:4px}
+.tabs button{border:0;background:none;color:var(--mute);font:inherit;font-weight:500;padding:8px 14px;border-radius:7px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--brand);color:var(--brand-ink)}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+.btn{background:var(--brand);color:var(--brand-ink);border:0;border-radius:8px;padding:9px 16px;font-weight:500;cursor:pointer}
+.btn.ghost{background:none;color:var(--ink);border:1px solid var(--line)}
+.btn.danger{background:var(--hi);color:#fff}
+.btn:hover{filter:brightness(1.08)}
+.bar{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.bar h2{margin:0 auto 0 0;font-size:1.15rem}
+input,select{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:8px 10px;min-width:0}
+.task{display:flex;gap:12px;align-items:flex-start;background:var(--card);border:1px solid var(--line);border-left:5px solid var(--p);border-radius:10px;padding:12px 14px;margin-bottom:8px}
+.task.High{--p:var(--hi)}.task.Medium{--p:var(--med)}.task.Low{--p:var(--lo)}
+.task input[type=checkbox]{width:20px;height:20px;margin-top:3px;accent-color:var(--brand);flex:none}
+.task .main{flex:1;min-width:0}
+.task .t{font-weight:500;overflow-wrap:anywhere}
+.task.Completed .t{text-decoration:line-through;color:var(--done)}
+.meta{display:flex;flex-wrap:wrap;gap:6px 12px;color:var(--mute);font-size:.85rem;margin-top:4px;align-items:center}
+.pill{border:1px solid var(--line);border-radius:99px;padding:0 9px;font-size:.78rem}
+.pri{color:var(--p);font-weight:700}
+.acts{display:flex;gap:4px;flex:none}
+.acts button{background:none;border:1px solid var(--line);border-radius:7px;padding:4px 9px;cursor:pointer;font-size:.85rem}
+.acts button:hover{border-color:var(--brand)}
+.empty{text-align:center;color:var(--mute);padding:36px 12px;border:1px dashed var(--line);border-radius:10px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.stat b{display:block;font-size:1.7rem;line-height:1.1}
+.stat span{color:var(--mute);font-size:.85rem}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:16px;margin-bottom:16px}
+.panel h3{margin:0 0 10px;font-size:1rem}
+.track{display:flex;height:14px;border-radius:99px;overflow:hidden;background:var(--line)}
+.track i{display:block;height:100%}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:.85rem;color:var(--mute)}
+.legend em{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:5px;font-style:normal}
+.cat{display:grid;grid-template-columns:100px 1fr 64px;gap:10px;align-items:center;margin:8px 0;font-size:.9rem}
+.cat .track{height:10px}
+dialog{border:1px solid var(--line);border-radius:14px;background:var(--card);color:var(--ink);padding:20px;width:min(440px,calc(100vw - 24px))}
+dialog::backdrop{background:rgba(0,0,0,.5)}
+dialog h3{margin:0 0 12px}
+label{display:block;font-size:.85rem;color:var(--mute);margin-bottom:10px}
+label input,label select{display:block;width:100%;margin-top:4px;color:var(--ink)}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.end{display:flex;justify-content:flex-end;gap:8px;margin-top:8px}
+[hidden]{display:none!important}
+@media(max-width:520px){.task{flex-wrap:wrap}.acts{width:100%;justify-content:flex-end}.cat{grid-template-columns:76px 1fr 54px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Daily Planner</h1>
+  <div class="tabs" role="tablist">
+    <button role="tab" id="tab-day" aria-selected="true">Daily view</button>
+    <button role="tab" id="tab-month" aria-selected="false">Monthly report</button>
+  </div>
+</header>
+
+<section id="view-day">
+  <div class="bar">
+    <h2 id="dayTitle"></h2>
+    <button class="btn ghost" id="prev" aria-label="Previous day">&lsaquo;</button>
+    <input type="date" id="dayPick" aria-label="Pick a date">
+    <button class="btn ghost" id="next" aria-label="Next day">&rsaquo;</button>
+    <button class="btn ghost" id="today">Today</button>
+    <button class="btn" id="add">Add task</button>
+  </div>
+  <div id="list"></div>
+</section>
+
+<section id="view-month" hidden>
+  <div class="bar">
+    <h2>Report for</h2>
+    <input type="month" id="monthPick" aria-label="Pick a month">
+    <button class="btn ghost" id="expMonth">Download month CSV</button>
+    <button class="btn ghost" id="expAll">Download all CSV</button>
+  </div>
+  <div class="stats" id="stats"></div>
+  <div class="panel"><h3>Completion</h3><div id="progress"></div></div>
+  <div class="panel"><h3>By category</h3><div id="cats"></div></div>
+</section>
+</div>
+
+<dialog id="form">
+  <h3 id="formTitle">Add task</h3>
+  <label>Task name<input id="f-title" maxlength="120" required></label>
+  <div class="row">
+    <label>Category<input id="f-cat" list="cats-list" placeholder="Work, Personal…" maxlength="30"></label>
+    <label>Priority<select id="f-pri"><option>Low</option><option selected>Medium</option><option>High</option></select></label>
+  </div>
+  <div class="row">
+    <label>Date<input type="date" id="f-date" required></label>
+    <label>Time<input type="time" id="f-time"></label>
+  </div>
+  <label>Status<select id="f-status"><option>Pending</option><option>In Progress</option><option>Completed</option></select></label>
+  <datalist id="cats-list"><option>Work</option><option>Personal</option><option>Fitness</option><option>Study</option></datalist>
+  <p id="err" style="color:var(--hi);margin:0" hidden></p>
+  <div class="end"><button class="btn ghost" id="cancel">Cancel</button><button class="btn" id="save">Save task</button></div>
+</dialog>
+
+<dialog id="confirm">
+  <h3>Delete this task?</h3>
+  <p id="confirmText" style="margin:0 0 8px;color:var(--mute)"></p>
+  <div class="end"><button class="btn ghost" id="noDel">Keep task</button><button class="btn danger" id="yesDel">Delete task</button></div>
+</dialog>
+
+<script>
+const KEY = 'dailyPlanner.v1';
+let state = { tasks: [], nextId: 1 };
+try { const s = JSON.parse(localStorage.getItem(KEY) || 'null'); if (s && Array.isArray(s.tasks)) state = s; } catch (e) {}
+const persist = () => { try { localStorage.setItem(KEY, JSON.stringify(state)); } catch (e) {} };
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+let day = iso(new Date());
+let month = day.slice(0, 7);
+let editId = null, delId = null;
+
+function shiftDay(n) { const d = new Date(day + 'T00:00'); d.setDate(d.getDate() + n); day = iso(d); render(); }
+
+function taskHTML(t) {
+  const done = t.status === 'Completed';
+  return `<div class="task ${esc(t.priority)} ${esc(t.status.replace(' ',''))} ${done ? 'Completed' : ''}" data-id="${t.id}">
+    <input type="checkbox" ${done ? 'checked' : ''} aria-label="Mark ${esc(t.title)} completed">
+    <div class="main">
+      <div class="t">${esc(t.title)}</div>
+      <div class="meta">
+        ${t.time ? `<span>${esc(t.time)}</span>` : ''}
+        ${t.category ? `<span class="pill">${esc(t.category)}</span>` : ''}
+        <span class="pri">${esc(t.priority)}</span>
+        <span>${esc(t.status)}</span>
+      </div>
+    </div>
+    <div class="acts"><button data-a="edit">Edit</button><button data-a="del">Delete</button></div>
+  </div>`;
+}
+
+function renderDay() {
+  $('dayPick').value = day;
+  $('dayTitle').textContent = new Date(day + 'T00:00').toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+  const items = state.tasks.filter(t => t.date === day).sort((a, b) => (a.time || '99:99').localeCompare(b.time || '99:99'));
+  $('list').innerHTML = items.length ? items.map(taskHTML).join('') : '<div class="empty">Nothing planned for this day. Add a task to get started.</div>';
+}
+
+function monthTasks() { return state.tasks.filter(t => t.date.startsWith(month)); }
+
+function renderMonth() {
+  $('monthPick').value = month;
+  const ts = monthTasks();
+  const c = s => ts.filter(t => t.status === s).length;
+  const total = ts.length, done = c('Completed'), prog = c('In Progress'), pend = c('Pending');
+  const rate = total ? Math.round(done / total * 100) : 0;
+  $('stats').innerHTML = [['Total tasks', total], ['Completed', done], ['In progress', prog], ['Pending', pend], ['Completion rate', rate + '%']]
+    .map(([l, v]) => `<div class="stat"><b>${v}</b><span>${l}</span></div>`).join('');
+  const pct = n => total ? n / total * 100 : 0;
+  $('progress').innerHTML = `<div class="track" role="img" aria-label="${rate}% completed">
+    <i style="width:${pct(done)}%;background:var(--lo)"></i><i style="width:${pct(prog)}%;background:var(--med)"></i></div>
+    <div class="legend"><span><em style="background:var(--lo)"></em>Completed ${done}</span><span><em style="background:var(--med)"></em>In progress ${prog}</span><span><em style="background:var(--line)"></em>Pending ${pend}</span></div>`;
+  const groups = {};
+  ts.forEach(t => { const k = t.category || 'Uncategorized'; (groups[k] = groups[k] || []).push(t); });
+  const keys = Object.keys(groups).sort((a, b) => groups[b].length - groups[a].length);
+  $('cats').innerHTML = keys.length ? keys.map(k => {
+    const g = groups[k], d = g.filter(t => t.status === 'Completed').length, p = Math.round(d / g.length * 100);
+    return `<div class="cat"><span>${esc(k)}</span><div class="track"><i style="width:${p}%;background:var(--brand)"></i></div><span>${d}/${g.length}</span></div>`;
+  }).join('') : '<div class="empty">No tasks in this month yet.</div>';
+}
+
+function render() { renderDay(); renderMonth(); }
+
+function openForm(t) {
+  editId = t ? t.id : null;
+  $('formTitle').textContent = t ? 'Edit task' : 'Add task';
+  $('f-title').value = t ? t.title : '';
+  $('f-cat').value = t ? t.category : '';
+  $('f-pri').value = t ? t.priority : 'Medium';
+  $('f-date').value = t ? t.date : day;
+  $('f-time').value = t ? t.time : '';
+  $('f-status').value = t ? t.status : 'Pending';
+  $('err').hidden = true;
+  $('form').showModal();
+  $('f-title').focus();
+}
+
+$('save').onclick = () => {
+  const title = $('f-title').value.trim(), date = $('f-date').value;
+  if (!title || !date) { $('err').textContent = 'Enter a task name and a date.'; $('err').hidden = false; return; }
+  const data = { title, category: $('f-cat').value.trim(), priority: $('f-pri').value, date, time: $('f-time').value, status: $('f-status').value };
+  if (editId) Object.assign(state.tasks.find(t => t.id === editId), data);
+  else state.tasks.push({ id: state.nextId++, ...data });
+  persist(); day = date; month = date.slice(0, 7);
+  $('form').close(); render();
+};
+$('cancel').onclick = () => $('form').close();
+$('add').onclick = () => openForm(null);
+
+$('list').addEventListener('click', e => {
+  const el = e.target.closest('.task'); if (!el) return;
+  const t = state.tasks.find(x => x.id === +el.dataset.id);
+  if (e.target.dataset.a === 'edit') openForm(t);
+  if (e.target.dataset.a === 'del') { delId = t.id; $('confirmText').textContent = t.title; $('confirm').showModal(); }
+});
+$('list').addEventListener('change', e => {
+  if (e.target.type !== 'checkbox') return;
+  const t = state.tasks.find(x => x.id === +e.target.closest('.task').dataset.id);
+  t.status = e.target.checked ? 'Completed' : 'Pending';
+  persist(); render();
+});
+$('noDel').onclick = () => $('confirm').close();
+$('yesDel').onclick = () => { state.tasks = state.tasks.filter(t => t.id !== delId); persist(); $('confirm').close(); render(); };
+
+$('prev').onclick = () => shiftDay(-1);
+$('next').onclick = () => shiftDay(1);
+$('today').onclick = () => { day = iso(new Date()); render(); };
+$('dayPick').onchange = e => { if (e.target.value) { day = e.target.value; render(); } };
+$('monthPick').onchange = e => { if (e.target.value) { month = e.target.value; renderMonth(); } };
+
+function show(which) {
+  const isDay = which === 'day';
+  $('view-day').hidden = !isDay; $('view-month').hidden = isDay;
+  $('tab-day').setAttribute('aria-selected', isDay); $('tab-month').setAttribute('aria-selected', !isDay);
+}
+$('tab-day').onclick = () => show('day');
+$('tab-month').onclick = () => { show('month'); renderMonth(); };
+
+const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
+async function exportCSV(list, name) {
+  if (!list.length) { alert('There are no tasks to export.'); return; }
+  const rows = [['Task ID', 'Task Name', 'Category', 'Date', 'Priority', 'Status']]
+    .concat(list.slice().sort((a, b) => a.date.localeCompare(b.date)).map(t => [t.id, t.title, t.category, t.date + (t.time ? ' ' + t.time : ''), t.priority, t.status]));
+  const csv = '\uFEFF' + rows.map(r => r.map(q).join(',')).join('\r\n');
+  let dl = null;
+  try { dl = await claude.use('downloads'); } catch (e) {}
+  try {
+    if (dl) { await dl.save({ filename: name, data: csv }); return; }
+  } catch (e) { if (e && e.code === 'declined') return; }
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv], { type: 'text/csv' }));
+  a.download = name; document.body.appendChild(a); a.click(); a.remove();
+}
+$('expMonth').onclick = () => exportCSV(monthTasks(), `tasks-${month}.csv`);
+$('expAll').onclick = () => exportCSV(state.tasks, 'tasks-all.csv');
+
+render();
+</script>
+</body>
+</html>
